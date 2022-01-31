@@ -1,0 +1,28 @@
+{
+  "connection_updated_at": "2021-01-29T03:37:43Z",
+  "connection_config": {
+    "connection_type": "humio",
+    "base_parallelism": {{ base_parallelism }},
+    "display_name": "{{ display_name }}",
+    "description": "{{ description }}",
+    "sampling_rate": {{ sampling_rate }},
+    "api_key": "{{ humio_api_token }}",
+    "url": "{{ humio_url }}",
+    "filters": "{{ filters }}",
+    "data_flow": true,
+    "collection_mode": "inference"
+  },
+  "connection_type": "humio",
+  "datasource_type": "logs",
+  "mapping": {
+    "codec": "humio",
+    "message_field": "{{ message_field }}",
+    "log_entity_types": "{{ log_entity_types }}",
+    "instance_id_field": "{{ instance_id_field }}",
+    "rolling_time": {{ rolling_time }},
+    "timestamp_field": "{{ timestamp_field }}"
+  },
+  "source_query_url": null,
+  "request_action": "create",
+  "data_flow": true
+}

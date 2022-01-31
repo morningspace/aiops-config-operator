@@ -1,0 +1,6 @@
+## Append samples you want in your CSV to this file as resources ##
+resources:
+- aiops_v1alpha1_humioconnection.yaml
+- aiops_v1alpha1_kafkaconnection.yaml
+- aiops_v1alpha1_kubeconnection.yaml
+#+kubebuilder:scaffold:manifestskustomizesamples

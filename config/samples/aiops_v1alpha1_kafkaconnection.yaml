@@ -1,0 +1,8 @@
+apiVersion: aiops.ibm.com/v1alpha1
+kind: KafkaConnection
+metadata:
+  name: kafkaconnection-sample
+spec:
+  # Add fields here
+  display_name: "My Kafka Connection"
+  description: "My Kafka connection"

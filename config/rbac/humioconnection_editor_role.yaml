@@ -1,0 +1,24 @@
+# permissions for end users to edit humioconnections.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: humioconnection-editor-role
+rules:
+- apiGroups:
+  - aiops.ibm.com
+  resources:
+  - humioconnections
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - aiops.ibm.com
+  resources:
+  - humioconnections/status
+  verbs:
+  - get

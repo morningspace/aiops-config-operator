@@ -1,0 +1,15 @@
+---
+# defaults file for KafkaConnection
+kind: 'KafkaConnection'
+api_version: 'aiops.ibm.com/v1alpha1'
+
+display_name: "Kafka"
+description: "Kafka connection"
+num_partitions: 1
+base_parallelism: 1
+codec: "humio"
+message_field: "@rawstring"
+log_entity_types: "kubernetes.namespace_name,kubernetes.container_hash,kubernetes.host,kubernetes.container_name,kubernetes.pod_name"
+instance_id_field: "kubernetes.container_name"
+rolling_time: 10
+timestamp_field: "@timestamp"

@@ -1,0 +1,28 @@
+---
+# tasks file for HumioConnection
+- name: Look up Humio credentials
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Secret
+    name: developer-user-token
+    namespace: humio-logging
+  register: humio_credentials
+
+- name: Look up Humio route
+  kubernetes.core.k8s_info:
+    api_version: route.openshift.io/v1
+    kind: Route
+    namespace: humio-logging
+    label_selectors:
+      - app = humio-core
+  register: humio_route
+
+- set_fact:
+    humio_api_token: "{{ humio_credentials.resources[0].data.token | b64decode }}"
+    humio_url: "http://{{ humio_route.resources[0].spec.host }}/api/v1/repositories/robot-shop/query/"
+    conn_template: humio-connection
+    conn_api_path: /v3/connections
+
+- block:
+  - include_tasks: ../../shared/get-access-token.yml
+  - include_tasks: ../../shared/setup-connection.yml

@@ -1,0 +1,10 @@
+---
+# tasks file for KafkaConnection
+- set_fact:
+    kafka_topic: "kafka-{{ lookup('community.general.random_string', length=8, upper=false, special=false) }}"
+    conn_template: kafka-connection
+    conn_api_path: /v3/connections
+
+- block:
+  - include_tasks: ../../shared/get-access-token.yml
+  - include_tasks: ../../shared/setup-connection.yml

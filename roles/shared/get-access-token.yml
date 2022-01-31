@@ -1,0 +1,56 @@
+---
+- name: Look up admin credentials
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Secret
+    name: platform-auth-idp-credentials
+    namespace: ibm-common-services
+  register: admin_credentials
+
+- name: Look up Cloud Pak console route
+  kubernetes.core.k8s_info:
+    api_version: route.openshift.io/v1
+    kind: Route
+    name: cp-console
+    namespace: ibm-common-services
+  register: cp_console_route
+
+- set_fact:
+    admin_username: "{{ admin_credentials.resources[0].data.admin_username | b64decode }}"
+    admin_password: "{{ admin_credentials.resources[0].data.admin_password | b64decode }}"
+    idprovider_url: "https://{{ cp_console_route.resources[0].spec.host }}/idprovider/v1/auth/identitytoken"
+
+- name: Look up IAM token
+  uri:
+    method: POST
+    headers:
+      Content-Type: application/x-www-form-urlencoded;charset=UTF-8
+    validate_certs: no
+    url: "{{ idprovider_url }}"
+    body: "grant_type=password&username={{ admin_username }}&password={{ admin_password }}&scope=openid"
+  register: iam_response
+
+- name: Lookup AIOps route
+  kubernetes.core.k8s_info:
+    api_version: route.openshift.io/v1
+    kind: Route
+    name: cpd
+    namespace: "{{ ansible_operator_meta.namespace }}"
+  register: cpd_route
+
+- set_fact:
+    iam_token: "{{ iam_response.json.access_token }}"
+    preauth_url: "https://{{ cpd_route.resources[0].spec.host }}/v1/preauth/validateAuth"
+
+- name: Look up access token
+  uri:
+    method: GET
+    headers:
+      "username": admin
+      "iam-token": "{{ iam_token }}"
+    validate_certs: no
+    url: "{{ preauth_url }}"
+  register: zen_response
+
+- set_fact:
+    access_token: "{{ zen_response.json.accessToken }}"

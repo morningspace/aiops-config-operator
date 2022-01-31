@@ -1,0 +1,9 @@
+---
+# test.yml as a ansible playbook
+- hosts: localhost
+  vars:
+    cp4waiops_namespace: cp4waiops
+  roles:
+  - ./roles/humioconnection
+  - ./roles/kafkaconnection
+  - ./roles/kubeconnection

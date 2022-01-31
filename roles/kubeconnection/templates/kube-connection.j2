@@ -1,0 +1,26 @@
+{
+   "connection_type": "kubernetes_observer",
+   "connection_config": {
+      "job_type": "local",
+      "observer_parameters": {
+         "type": "string",
+         "description": "{{ description }}",
+         "parameters": {
+            "data_center": "Demo DataCenter",
+            "namespace": "{{ app_namespace }}",
+            "connect_read_timeout_ms": {{ connect_read_timeout_ms }},
+            "namespaceGroupParameters": {
+               "correlate": true
+            },
+            "hide_terminated_pods": {{ hide_terminated_pods }},
+            "role_token": false
+         },
+         "schedule": {
+            "interval": {{ schedule.interval }},
+            "units": "{{ schedule.units }}"
+         },
+         "scheduleRequest": {{ scheduleRequest }}
+      }
+   },
+   "datasource_type": "topology"
+}

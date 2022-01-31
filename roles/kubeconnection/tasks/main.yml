@@ -1,0 +1,9 @@
+---
+# tasks file for KubeConnection
+- set_fact:
+    conn_template: kube-connection
+    conn_api_path: /v1/observer/connections?connection_id={{ ansible_operator_meta.name }}
+
+- block:
+  - include_tasks: ../../shared/get-access-token.yml
+  - include_tasks: ../../shared/setup-connection.yml

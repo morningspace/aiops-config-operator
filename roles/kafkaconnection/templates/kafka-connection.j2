@@ -1,0 +1,25 @@
+{
+  "connection_updated_at": "2022-01-28T03:02:32.595039Z",
+  "connection_config": {
+    "connection_type": "kafka",
+    "base_parallelism": {{ base_parallelism }},
+    "display_name": "{{ display_name }}",
+    "description": "{{ description }}",
+    "topic": "{{ kafka_topic }}",
+    "num_partitions": {{ num_partitions }},
+    "data_flow": true,
+    "collection_mode": "inference"
+  },
+  "connection_type": "kafka",
+  "datasource_type": "logs",
+  "mapping": {
+    "codec": "{{ codec }}",
+    "message_field": "{{ message_field }}",
+    "log_entity_types": "{{ log_entity_types }}",
+    "instance_id_field": "{{ instance_id_field }}",
+    "rolling_time": {{ rolling_time }},
+    "timestamp_field": "{{ timestamp_field }}"
+  },
+  "request_action": "create",
+  "data_flow": true
+}

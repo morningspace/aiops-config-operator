@@ -1,0 +1,71 @@
+---
+- name: Look up connection information
+  kubernetes.core.k8s_info:
+    api_version: "{{ api_version }}"
+    kind: "{{ kind }}"
+    name: ansible_operator_meta.name
+    namespace: ansible_operator_meta.namespace
+  register: conn
+
+- name: Look up aio controller route
+  kubernetes.core.k8s_info:
+    api_version: route.openshift.io/v1
+    kind: Route
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    name: aimanager-aio-controller
+  register: conn_route
+
+- set_fact:
+    default_conn_api_base: 'aimanager-aio-controller.{{ ansible_operator_meta.namespace }}.svc.cluster.local:8000'
+
+- set_fact:
+    conn_id: {{ conn.resources[0].status.connectionId }}
+    conn_api_base: "https://{{ conn_route.resources[0].spec.host | default('{{ default_conn_api_base }}') }}"
+
+- name: Create connection
+  uri:
+    method: POST
+    headers:
+      "Content-Type": application/json
+      "Authorization": "Bearer {{ access_token }}"
+    validate_certs: no
+    url: "{{ conn_api_base }}{{ conn_api_path }}"
+    body: "{{ lookup('template','../templates/{{ conn_template }}.j2') }}"
+    body_format: json
+    status_code: 201
+    return_content: yes
+  register: conn_response
+  when: not conn_id
+
+- name: Update connection
+  uri:
+    method: PUT
+    headers:
+      "Content-Type": application/json
+      "Authorization": "Bearer {{ access_token }}"
+    validate_certs: no
+    url: "{{ conn_api_base }}{{ conn_api_path }}/{{ conn_id }}"
+    body: "{{ lookup('template','../templates/{{ conn_template }}.j2') }}"
+    body_format: json
+    status_code: 200
+    return_content: yes
+  register: conn_response
+  when: conn_id
+
+- set_fact:
+    conn_id: {{ conn_response.json.connection_id }}
+  when: not conn_id
+
+- name: Update connection CR status
+  operator_sdk.util.k8s_status:
+    api_version: '{{ api_version }}'
+    kind: "{{ kind }}"
+    name: "{{ ansible_operator_meta.name }}"
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    status:
+      connectionId: "{{ conn_id }}"
+  when: conn_id
+
+- debug:
+    msg:
+      - "{{ conn_response }}"

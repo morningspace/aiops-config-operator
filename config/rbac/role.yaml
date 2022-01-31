@@ -1,0 +1,91 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: manager-role
+rules:
+  ##
+  ## Base operator rules
+  ##
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+      - pods
+      - pods/exec
+      - pods/log
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - apps
+    resources:
+      - deployments
+      - daemonsets
+      - replicasets
+      - statefulsets
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  ##
+  ## Rules for aiops.ibm.com/v1alpha1, Kind: HumioConnection
+  ##
+  - apiGroups:
+      - aiops.ibm.com
+    resources:
+      - humioconnections
+      - humioconnections/status
+      - humioconnections/finalizers
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  ##
+  ## Rules for aiops.ibm.com/v1alpha1, Kind: KafkaConnection
+  ##
+  - apiGroups:
+      - aiops.ibm.com
+    resources:
+      - kafkaconnections
+      - kafkaconnections/status
+      - kafkaconnections/finalizers
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  ##
+  ## Rules for aiops.ibm.com/v1alpha1, Kind: KubeConnection
+  ##
+  - apiGroups:
+      - aiops.ibm.com
+    resources:
+      - kubeconnections
+      - kubeconnections/status
+      - kubeconnections/finalizers
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+#+kubebuilder:scaffold:rules

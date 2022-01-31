@@ -1,0 +1,16 @@
+---
+# defaults file for HumioConnection
+kind: 'HumioConnection'
+api_version: 'aiops.ibm.com/v1alpha1'
+
+display_name: "Humio"
+description: "Humio connection"
+base_parallelism: 1
+sampling_rate: 60000
+collection_mode: "inference"
+filters: '\"kubernetes.namespace_name\" = /robot-shop/\n | \"kubernetes.container_name\" = web or ratings or catalogue'
+message_field: "@rawstring"
+log_entity_types: "kubernetes.namespace_name,kubernetes.container_hash,kubernetes.host,kubernetes.container_name,kubernetes.pod_name"
+instance_id_field: "kubernetes.container_name"
+rolling_time: 10
+timestamp_field: "@timestamp"
