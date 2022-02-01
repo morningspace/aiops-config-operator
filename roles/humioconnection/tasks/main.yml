@@ -1,30 +1,39 @@
 ---
 # tasks file for HumioConnection
-- name: Look up Humio credentials
-  kubernetes.core.k8s_info:
-    api_version: v1
-    kind: Secret
-    name: developer-user-token
-    namespace: humio-logging
-  register: humio_credentials
-
-- name: Look up Humio route
-  kubernetes.core.k8s_info:
-    api_version: route.openshift.io/v1
-    kind: Route
-    namespace: humio-logging
-    label_selectors:
-      - app = humio-core
-  register: humio_route
-
 - set_fact:
-    humio_api_token: "{{ humio_credentials.resources[0].data.token | b64decode }}"
-    humio_url: "http://{{ humio_route.resources[0].spec.host }}/api/v1/repositories/robot-shop/query/"
-    conn_template: humio-connection
     create_conn_apipath: /v3/connections
-    update_conn_apipath: /v3/connections
     get_conn_apipath: /v3/connections
+    update_conn_apipath: /v3/connections
+    delete_conn_apipath: /v3/connections
+    conn_template: humio-connection
+
+- include_tasks: ../../shared/get-access-token.yml
+- include_tasks: ../../shared/set-api-base-url.yml
 
 - block:
-  - include_tasks: ../../shared/get-access-token.yml
+  - name: Look up Humio credentials
+    kubernetes.core.k8s_info:
+      api_version: v1
+      kind: Secret
+      name: developer-user-token
+      namespace: humio-logging
+    register: humio_credentials
+
+  - name: Look up Humio route
+    kubernetes.core.k8s_info:
+      api_version: route.openshift.io/v1
+      kind: Route
+      namespace: humio-logging
+      label_selectors:
+        - app = humio-core
+    register: humio_route
+
+  - set_fact:
+    humio_api_token: "{{ humio_credentials.resources[0].data.token | b64decode }}"
+    humio_url: "http://{{ humio_route.resources[0].spec.host }}/api/v1/repositories/robot-shop/query/"
+
   - include_tasks: ../../shared/setup-connection.yml
+  when: state is not defined
+
+- include_tasks: ../../shared/teardown-connection.yml
+  when: state is defined and state == 'absent'

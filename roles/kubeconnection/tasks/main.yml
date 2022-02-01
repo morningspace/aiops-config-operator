@@ -1,12 +1,18 @@
 ---
 # tasks file for KubeConnection
 - set_fact:
-    conn_template: kube-connection
     create_conn_apipath: /v1/observer/connections?connection_id={{ ansible_operator_meta.name }}
+    get_conn_apipath:    /v1/observer/connections
     update_conn_apipath: /v1/observer/connections
-    get_conn_apipath: /v1/observer/connections
+    delete_conn_apipath: /v1/observer/connections
+    conn_template: kube-connection
     connection_id: '{{ ansible_operator_meta.name }}'
 
-- block:
-  - include_tasks: ../../shared/get-access-token.yml
-  - include_tasks: ../../shared/setup-connection.yml
+- include_tasks: ../../shared/get-access-token.yml
+- include_tasks: ../../shared/set-api-base-url.yml
+
+- include_tasks: ../../shared/setup-connection.yml
+  when: state is not defined
+
+- include_tasks: ../../shared/teardown-connection.yml
+  when: state is defined and state == 'absent'

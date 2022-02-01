@@ -1,0 +1,28 @@
+---
+- name: 'Get {{ kind }} CR'
+  kubernetes.core.k8s_info:
+    api_version: '{{ api_version }}'
+    kind: '{{ kind }}'
+    name: '{{ ansible_operator_meta.name }}'
+    namespace: '{{ ansible_operator_meta.namespace }}'
+  register: conn_cr
+
+- name: Get connection_id from CR status if CR is found
+  set_fact:
+    connection_id: '{{ conn_cr.resources[0].status.connectionInfo.connection_id }}'
+  when:
+    - conn_cr.resources[0] is defined
+    - conn_cr.resources[0].status.connectionInfo is defined
+    - conn_cr.resources[0].status.connectionInfo.connection_id is defined
+
+- name: Delete connection
+  uri:
+    method: DELETE
+    headers:
+      "Content-Type": application/json
+      "Authorization": 'Bearer {{ access_token }}'
+    validate_certs: no
+    url: '{{ conn_api_base }}{{ delete_conn_apipath }}/{{ connection_id }}'
+    status_code: 204
+  register: res
+  when: (connection_id is defined) and (connection_id|length > 0)

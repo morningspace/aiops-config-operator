@@ -1,12 +1,18 @@
 ---
 # tasks file for KafkaConnection
 - set_fact:
-    kafka_topic: "cp4waiops-cartridge-logs-{{ codec }}-{{ lookup('community.general.random_string', length=8, upper=false, special=false) }}"
-    conn_template: kafka-connection
     create_conn_apipath: /v3/connections
+    get_conn_apipath:    /v3/connections
     update_conn_apipath: /v3/connections
-    get_conn_apipath: /v3/connections
+    delete_conn_apipath: /v3/connections
+    conn_template: kafka-connection
+    kafka_topic: "cp4waiops-cartridge-logs-{{ codec }}-{{ lookup('community.general.random_string', length=8, upper=false, special=false) }}"
 
-- block:
-  - include_tasks: ../../shared/get-access-token.yml
-  - include_tasks: ../../shared/setup-connection.yml
+- include_tasks: ../../shared/get-access-token.yml
+- include_tasks: ../../shared/set-api-base-url.yml
+
+- include_tasks: ../../shared/setup-connection.yml
+  when: state is not defined
+
+- include_tasks: ../../shared/teardown-connection.yml
+  when: state is defined and state == 'absent'
