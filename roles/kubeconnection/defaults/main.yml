@@ -3,8 +3,8 @@
 kind: 'KubeConnection'
 api_version: 'aiops.ibm.com/v1alpha1'
 
-description: "Kubernetes observer for my application"
-app_namespace: "default"
+description: ""
+app_namespace: "robot-shop"
 connect_read_timeout_ms: 5000
 hide_terminated_pods: true
 schedule:

@@ -3,8 +3,8 @@
 kind: 'HumioConnection'
 api_version: 'aiops.ibm.com/v1alpha1'
 
-display_name: "Humio"
-description: "Humio connection"
+display_name: "{{ ansible_operator_meta.name }}"
+description: ""
 base_parallelism: 1
 sampling_rate: 60000
 collection_mode: "inference"

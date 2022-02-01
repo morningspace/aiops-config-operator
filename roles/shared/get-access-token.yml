@@ -1,5 +1,5 @@
 ---
-- name: Look up admin credentials
+- name: Get admin credentials
   kubernetes.core.k8s_info:
     api_version: v1
     kind: Secret
@@ -7,7 +7,7 @@
     namespace: ibm-common-services
   register: admin_credentials
 
-- name: Look up Cloud Pak console route
+- name: Get cp-console route
   kubernetes.core.k8s_info:
     api_version: route.openshift.io/v1
     kind: Route
@@ -15,12 +15,13 @@
     namespace: ibm-common-services
   register: cp_console_route
 
-- set_fact:
+- name: Set admin username, password and idprovider URL
+  set_fact:
     admin_username: "{{ admin_credentials.resources[0].data.admin_username | b64decode }}"
     admin_password: "{{ admin_credentials.resources[0].data.admin_password | b64decode }}"
     idprovider_url: "https://{{ cp_console_route.resources[0].spec.host }}/idprovider/v1/auth/identitytoken"
 
-- name: Look up IAM token
+- name: Get IAM token by admin username and password
   uri:
     method: POST
     headers:
@@ -30,7 +31,7 @@
     body: "grant_type=password&username={{ admin_username }}&password={{ admin_password }}&scope=openid"
   register: iam_response
 
-- name: Lookup AIOps route
+- name: Get cpd route
   kubernetes.core.k8s_info:
     api_version: route.openshift.io/v1
     kind: Route
@@ -42,7 +43,7 @@
     iam_token: "{{ iam_response.json.access_token }}"
     preauth_url: "https://{{ cpd_route.resources[0].spec.host }}/v1/preauth/validateAuth"
 
-- name: Look up access token
+- name: Get access token by IAM token
   uri:
     method: GET
     headers:
@@ -50,7 +51,7 @@
       "iam-token": "{{ iam_token }}"
     validate_certs: no
     url: "{{ preauth_url }}"
-  register: zen_response
+  register: res
 
 - set_fact:
-    access_token: "{{ zen_response.json.accessToken }}"
+    access_token: "{{ res.json.accessToken }}"

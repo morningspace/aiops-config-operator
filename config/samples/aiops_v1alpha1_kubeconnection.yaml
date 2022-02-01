@@ -1,6 +1,6 @@
 apiVersion: aiops.ibm.com/v1alpha1
 kind: KubeConnection
 metadata:
-  name: kubeconnection-sample
-spec:
+  name: sample
+# spec:
   # Add fields here
