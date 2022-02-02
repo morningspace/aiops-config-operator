@@ -4,7 +4,7 @@
   group: aiops.ibm.com
   kind: HumioConnection
   role: humioconnection
-  reconcilePeriod: 60s
+  reconcilePeriod: 300s
   finalizer:
     name: aiops.ibm.com/finalizer
     vars:
@@ -13,7 +13,7 @@
   group: aiops.ibm.com
   kind: KafkaConnection
   role: kafkaconnection
-  reconcilePeriod: 60s
+  reconcilePeriod: 300s
   finalizer:
     name: aiops.ibm.com/finalizer
     vars:
@@ -22,7 +22,7 @@
   group: aiops.ibm.com
   kind: KubeConnection
   role: kubeconnection
-  reconcilePeriod: 60s
+  reconcilePeriod: 300s
   finalizer:
     name: aiops.ibm.com/finalizer
     vars:

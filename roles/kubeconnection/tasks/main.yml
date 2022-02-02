@@ -10,6 +10,7 @@
 
 - include_tasks: ../../shared/get-access-token.yml
 - include_tasks: ../../shared/set-api-base-url.yml
+- include_tasks: ../../shared/set-connection-id.yml
 
 - include_tasks: ../../shared/setup-connection.yml
   when: state is not defined

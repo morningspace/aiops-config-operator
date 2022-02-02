@@ -1,50 +1,7 @@
 ---
-- name: Set connection_id if not specified
-  block:
-    - name: 'Get {{ kind }} CR'
-      kubernetes.core.k8s_info:
-        api_version: '{{ api_version }}'
-        kind: '{{ kind }}'
-        name: '{{ ansible_operator_meta.name }}'
-        namespace: '{{ ansible_operator_meta.namespace }}'
-      register: conn_cr
-    - name: Get connection_id from CR status if CR is found
-      set_fact:
-        connection_id: '{{ conn_cr.resources[0].status.connectionInfo.connection_id }}'
-      when:
-        - conn_cr.resources[0] is defined
-        - conn_cr.resources[0].status.connectionInfo is defined
-        - conn_cr.resources[0].status.connectionInfo.connection_id is defined
-  when: (connection_id is not defined) or (connection_id|length == 0)
-
-- name: Look up connection info by connection_id
-  block:
-    - name: Get connection by connection_id
-      uri:
-        method: GET
-        headers:
-          "Content-Type": application/json
-          "Authorization": 'Bearer {{ access_token }}'
-        validate_certs: no
-        url: '{{ conn_api_base }}{{ get_conn_apipath }}/{{ connection_id }}'
-      register: res
-      failed_when: false
-    - name: Test if connection exists by connection_id
-      set_fact:
-        conn_exists: true
-      when: res.status == 200
-    - name: Set kafka topic if defined in connection
-      set_fact:
-        kafka_topic: '{{ res.json.connection_config.topic }}'
-      when:
-        - res.status == 200
-        - res.json.connection_config.topic is defined
-        - res.json.connection_config.topic|length > 0
-  when: (connection_id is defined) and (connection_id|length > 0)
-
 - name: Update existing connection
   block:
-    - name: Update connection
+    - name: 'Update {{ kind }}: {{ ansible_operator_meta.name }}'
       uri:
         method: PUT
         headers:
@@ -56,7 +13,9 @@
         body_format: json
         status_code: 200
       register: res
-    - name: Update connection CR status
+      changed_when: res.status == 200
+
+    - name: 'Update {{ kind }}/{{ ansible_operator_meta.name }} status'
       operator_sdk.util.k8s_status:
         api_version: '{{ api_version }}'
         kind: '{{ kind }}'
@@ -68,7 +27,7 @@
 
 - name: Create new connection
   block:
-    - name: Create connection
+    - name: 'Create {{ kind }}: {{ ansible_operator_meta.name }}'
       uri:
         method: POST
         headers:
@@ -80,9 +39,14 @@
         body_format: json
         status_code: 201
       register: res
-    - debug:
-        var: res
-    - name: Update connection CR status
+      changed_when: res.status == 201
+
+    - name: Get connection_id from response
+      set_fact:
+        connection_id: '{{ res.json.connection_id }}'
+      when: res.json.connection_id is defined
+
+    - name: Update {{ kind }}/{{ ansible_operator_meta.name }} status
       operator_sdk.util.k8s_status:
         api_version: '{{ api_version }}'
         kind: '{{ kind }}'

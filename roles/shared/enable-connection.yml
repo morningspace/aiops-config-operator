@@ -1,0 +1,25 @@
+---
+- name: 'Check {{ kind }}: {{ ansible_operator_meta.name }} status'
+  uri:
+    method: GET
+    headers:
+      "Content-Type": application/json
+      "Authorization": 'Bearer {{ access_token }}'
+    validate_certs: no
+    url: '{{ conn_api_base }}{{ update_conn_apipath }}/{{ connection_id }}/status'
+    status_code: [200, 404]
+  register: res
+  when: (connection_id is defined) and (connection_id|length > 0)
+
+- name: 'Enable {{ kind }}: {{ ansible_operator_meta.name }}'
+  uri:
+    method: PUT
+    headers:
+      "Content-Type": application/json
+      "Authorization": 'Bearer {{ access_token }}'
+    validate_certs: no
+    url: '{{ conn_api_base }}{{ update_conn_apipath }}/{{ connection_id }}/enable'
+    status_code: 200
+  when:
+    - (connection_id is defined) and (connection_id|length > 0)
+    - res.status == 404

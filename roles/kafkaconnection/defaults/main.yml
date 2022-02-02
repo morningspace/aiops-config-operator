@@ -3,7 +3,7 @@
 kind: 'KafkaConnection'
 api_version: 'aiops.ibm.com/v1alpha1'
 
-display_name: "{{ ansible_operator_meta.name }}2"
+display_name: "{{ ansible_operator_meta.name }}"
 description: ""
 num_partitions: 1
 base_parallelism: 1

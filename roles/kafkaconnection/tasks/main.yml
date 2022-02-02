@@ -6,13 +6,20 @@
     update_conn_apipath: /v3/connections
     delete_conn_apipath: /v3/connections
     conn_template: kafka-connection
+    connection_id: ''
     kafka_topic: "cp4waiops-cartridge-logs-{{ codec }}-{{ lookup('community.general.random_string', length=8, upper=false, special=false) }}"
 
 - include_tasks: ../../shared/get-access-token.yml
 - include_tasks: ../../shared/set-api-base-url.yml
+- include_tasks: ../../shared/set-connection-id.yml
 
-- include_tasks: ../../shared/setup-connection.yml
+- block:
+  - include_tasks: ../../shared/disable-connection.yml
+  - include_tasks: ../../shared/setup-connection.yml
+  - include_tasks: ../../shared/enable-connection.yml
   when: state is not defined
 
-- include_tasks: ../../shared/teardown-connection.yml
+- block:
+  - include_tasks: ../../shared/disable-connection.yml
+  - include_tasks: ../../shared/teardown-connection.yml
   when: state is defined and state == 'absent'
