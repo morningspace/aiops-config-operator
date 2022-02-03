@@ -1,6 +1,6 @@
 apiVersion: aiops.ibm.com/v1alpha1
 kind: KafkaConnection
 metadata:
-  name: sample
+  name: kafka-sample
 # spec:
   # Add fields here

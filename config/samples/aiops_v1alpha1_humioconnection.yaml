@@ -1,6 +1,6 @@
 apiVersion: aiops.ibm.com/v1alpha1
 kind: HumioConnection
 metadata:
-  name: sample
+  name: humio-sample
 # spec:
   # Add fields here
