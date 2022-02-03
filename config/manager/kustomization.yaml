@@ -7,3 +7,9 @@ generatorOptions:
 configMapGenerator:
 - files:
   - controller_manager_config.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+images:
+- name: controller
+  newName: quay.io/moyingbj/aiops-config-operator
+  newTag: 0.0.1
